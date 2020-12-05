@@ -1,0 +1,40 @@
+<html> 
+    <head> 
+        <title> Shoryuken </title>
+        <link href="https://fonts.googleapis.com/css?family=Londrina+Solid|Slabo+27px" rel="stylesheet">
+        <link rel='stylesheet' href='./assets/styles/index.css'>
+        <script async src='./assets/scripts/index.js'></script>
+    </head>
+    <body>
+        <main>
+            <a href='./contact.html'>Go to Contact</a>
+            <header>
+                <img alt='Ryu Street Fighter 2 Shoryukening' src='./shoryuken.png'></img>
+                <h1> Shoryuken </h1>
+            </header>
+            <ul>
+                <li>
+                    <input placeholder='Type your question and then press the return key'></input> 
+                </li>
+            </ul>
+        </main>
+        <template id='question-template'>
+            <li> 
+                <div class='arrow-container'>
+                    <button id='up-arrow-button'>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
+                        </svg>
+                    </button>
+                    <span id='votes'></span>
+                    <button id='down-arrow-button'>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </button>
+                </div>
+                <span id='question'>
+                </span>
+            </li>
+    </body>
+</html>

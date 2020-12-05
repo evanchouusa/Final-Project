@@ -1,0 +1,19 @@
+{
+  "name": "fetch-example",
+  "version": "0.0.1",
+  "description": "An example applic ation to show reading and writing from a CSV",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Arman Elahi",
+  "license": "MIT",
+  "dependencies": {
+    "compression": "^1.7.4",
+    "cookie-session": "^1.4.0",
+    "express": "^4.17.1",
+    "firebase": "^8.0.1",
+    "uuid": "^8.3.1",
+    "uuidv4": "^6.2.4"
+  }
+}
