@@ -23,88 +23,18 @@ const convertURLToElement = (list) => {
     //return clone;
 };
 
-const convertListToElement = (data) => {
-    const template = document.getElementById("url-template");
-    const clone = template.content.cloneNode(true);
-
-    //list.YoutubeURL.forEach(element => clone.querySelector("#url").textContent = element);
-    clone.querySelector("#url").textContent = data;
-    return clone;
-};
 
 window.onload = () => {
 
     const urlParams = new URLSearchParams(window.location.search);
     const myRoom = urlParams.get('room');
 
-    console.log(myRoom);
-
     const joinpage = document.getElementById("join");
     const createpage = document.getElementById("create");
 
-    //this is for playvideos
-    if (!isNaN(myRoom) && myRoom != null) {
-        fetch(`/room/${myRoom}`)
-            .then((response) => (response.ok ? response.json() : Promise.reject()))
-            .then((data) => {
-                console.log(data);
-                //inputElement.classList.remove("error");
-                //inputElement.value = "";
-                const listElement = document.querySelector("ul");
-                //console(data.YoutubeURL.split(','));
-                //let myList = data.YoutubeURL.split(',').forEach((element) => element.substring(element.lastIndexOf('/') + 1));
-                //console.log(myList);
-                localStorage.setItem('YoutubeURL', data.YoutubeURL);
-                data.YoutubeURL.split(',')
-                    //data.YoutubeURL
-                    .map(convertListToElement)
-                    .forEach((element) => listElement.appendChild(element));
-            })
-            .catch(failAllGet);
 
-        document.getElementById("add").addEventListener("click", (event) => {
-            const headers = new Headers();
-            headers.set("content-type", "application/json");
-
-            if (document.getElementById("youtubeurl").value === "") {
-                alert("youtube url is required");
-            } else {
-                const newURL = document.getElementById("youtubeurl").value;
-
-                fetch(`/api/${myRoom}`, {
-                        headers,
-                        method: "POST",
-                        body: JSON.stringify({
-                            YoutubeURL: `${newURL}`,
-                        }),
-                    })
-                    .then((response) => {
-                        return response.ok && response.status === 201 ?
-                            response.json() :
-                            Promise.reject(response.status);
-                    })
-                    .then((data) => {
-
-                        console.log(data);
-
-                        inputElement.classList.remove("error");
-                        inputElement.value = "";
-                        const listElement = document.querySelector("ul");
-                        listElement.append(convertListToElement(data.YoutubeURL));
-                    })
-                    .catch((status) => {
-                        console.log(status);
-                        const listElement = document.querySelector("ul");
-                        const newItem = { YoutubeURL: `${newURL}` };
-                        listElement.append(convertListToElement(newItem.YoutubeURL));
-                        inputElement.classList.add("error");
-                    });
-            }
-        });
-
-    }
     //if joinpage is not undefined, click join button
-    else if (joinpage != undefined) {
+    if (joinpage != undefined) {
         document.getElementById("join").addEventListener("click", (event) => {
             const copyurl = document.getElementById("youtubeurl").value;
             window.location.href = copyurl;
