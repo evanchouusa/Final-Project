@@ -1,0 +1,39 @@
+<html>
+
+<head>
+    <title> Play Videos </title>
+    <link href="https://fonts.googleapis.com/css?family=Londrina+Solid|Slabo+27px" rel="stylesheet">
+    <link rel='stylesheet' href='./assets/styles/index.css'>
+    <script async src='./assets/scripts/index.js'></script>
+    <script defer src='./assets/scripts/playvideos.js'></script>
+</head>
+
+<body>
+    <main>
+        <header>
+            <img alt='Youtube Image' src='./youtubeimage.png'></img>
+        </header>
+        <header>
+            <h1> Video Room </h1>
+        </header>
+
+        <div id="player" style="text-align: center"></div>
+        <p>
+            Add next Youtube Video:
+        </p>
+        <ul>
+            <li>
+                <input id="youtubeurl" placeholder='Add next youtube video link'></input>
+            </li>
+        </ul>
+        <div class="row">
+            <a id="add" class="button" href="#">Add</a>
+        </div>
+    </main>
+    <template id='url-template'>
+            <li> 
+                <span id='url'>
+                </span>
+            </li>
+    </body>
+</html>
