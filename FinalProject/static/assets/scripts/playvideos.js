@@ -1,10 +1,11 @@
 const mainElement = document.getElementsByTagName("main")[0];
 const inputElement = document.querySelector("input");
 let myList = [];
-
+let player;
+let previousIndex = 0;
 
  function onYouTubeIframeAPIReady() {
-     console.log(localStorage.getItem('YoutubeURL'));
+
      player = new YT.Player('player', {
          height: '390',
          width: '640',
@@ -20,7 +21,6 @@ let myList = [];
              'onStateChange': onPlayerStateChange
          }
      });
-
  }
 
  // 4. The API will call this function when the video player is ready.
@@ -36,9 +36,26 @@ let myList = [];
 
  function onPlayerStateChange(event) {
      if (event.data == YT.PlayerState.PLAYING && !done) {
+
          setTimeout(stopVideo, 6000);
          done = true;
      }
+	 else if (event.data == YT.PlayerState.ENDED) {
+		let index = player.getPlaylistIndex();
+		if(player.getPlaylist().length != myList.length) {
+                        
+				// update playlist and start playing at the proper index
+				player.loadPlaylist(myList, previousIndex+1);
+		}
+
+			/*
+			keep track of the last index we got
+			if videos are added while the last playlist item is playing,
+			the next index will be zero and skip the new videos
+			to make sure we play the proper video, we use "last index + 1"
+			*/
+			previousIndex = index;
+	 }
  }
 
  function stopVideo() {
