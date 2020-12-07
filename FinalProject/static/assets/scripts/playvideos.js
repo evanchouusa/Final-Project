@@ -4,66 +4,64 @@ let myList = [];
 let player;
 let previousIndex = 0;
 
- function onYouTubeIframeAPIReady() {
+function onYouTubeIframeAPIReady() {
 
-     player = new YT.Player('player', {
-         height: '390',
-         width: '640',
-         loadPlaylist: {
-             listType: 'playlist',
-             list: myList,
-             //list: ['lJlEQim-yMo'],
-             index: parseInt(0),
-             suggestedQuality: 'small'
-         },
-         events: {
-             'onReady': onPlayerReady,
-             'onStateChange': onPlayerStateChange
-         }
-     });
- }
+    player = new YT.Player('player', {
+        height: '390',
+        width: '640',
+        loadPlaylist: {
+            listType: 'playlist',
+            list: myList,
+            //list: ['lJlEQim-yMo'],
+            index: parseInt(0),
+            suggestedQuality: 'small'
+        },
+        events: {
+            'onReady': onPlayerReady,
+            'onStateChange': onPlayerStateChange
+        }
+    });
+}
 
- // 4. The API will call this function when the video player is ready.
- function onPlayerReady(event) {
-     event.target.loadPlaylist(myList);
-     //event.target.loadPlaylist(['lJlEQim-yMo']);
- }
+// 4. The API will call this function when the video player is ready.
+function onPlayerReady(event) {
+    event.target.loadPlaylist(myList);
+    //event.target.loadPlaylist(['lJlEQim-yMo']);
+}
 
- // 5. The API calls this function when the player's state changes.
- //    The function indicates that when playing a video (state=1),
- //    the player should play for six seconds and then stop.
- var done = false;
+// 5. The API calls this function when the player's state changes.
+//    The function indicates that when playing a video (state=1),
+//    the player should play for six seconds and then stop.
+var done = false;
 
- function onPlayerStateChange(event) {
-     if (event.data == YT.PlayerState.PLAYING && !done) {
+function onPlayerStateChange(event) {
+    if (event.data == YT.PlayerState.PLAYING && !done) {
+        setTimeout(stopVideo, 6000);
+        done = true;
+    } else if (event.data == YT.PlayerState.ENDED) {
+        let index = player.getPlaylistIndex();
+        if (player.getPlaylist().length != myList.length) {
 
-         setTimeout(stopVideo, 6000);
-         done = true;
-     }
-	 else if (event.data == YT.PlayerState.ENDED) {
-		let index = player.getPlaylistIndex();
-		if(player.getPlaylist().length != myList.length) {
-                        
-				// update playlist and start playing at the proper index
-				player.loadPlaylist(myList, previousIndex+1);
-		}
+            // update playlist and start playing at the proper index
+            player.loadPlaylist(myList, previousIndex + 1);
+        }
 
-			/*
-			keep track of the last index we got
-			if videos are added while the last playlist item is playing,
-			the next index will be zero and skip the new videos
-			to make sure we play the proper video, we use "last index + 1"
-			*/
-			previousIndex = index;
-	 }
- }
+        /*
+        keep track of the last index we got
+        if videos are added while the last playlist item is playing,
+        the next index will be zero and skip the new videos
+        to make sure we play the proper video, we use "last index + 1"
+        */
+        previousIndex = index;
+    }
+}
 
- function stopVideo() {
-     player.stopVideo();
- }
- 
+function stopVideo() {
+    player.stopVideo();
+}
 
- const convertListToElement = (data) => {
+
+const convertListToElement = (data) => {
     const template = document.getElementById("url-template");
     const clone = template.content.cloneNode(true);
 
@@ -73,31 +71,31 @@ let previousIndex = 0;
 };
 
 function addList(element) {
-	let idIndex=element.lastIndexOf('/')+1;
-	if (element.lastIndexOf('=')+1>idIndex)
-		idIndex=element.lastIndexOf('=')+1;
-	myList.push(element.substring(idIndex));
+    let idIndex = element.lastIndexOf('/') + 1;
+    if (element.lastIndexOf('=') + 1 > idIndex)
+        idIndex = element.lastIndexOf('=') + 1;
+    myList.push(element.substring(idIndex));
 }
 
- window.onload = () => {
- 
+window.onload = () => {
+
     const urlParams = new URLSearchParams(window.location.search);
     const myRoom = urlParams.get('room');
-	localStorage.removeItem('YoutubeURL');
+    localStorage.removeItem('YoutubeURL');
 
     if (!isNaN(myRoom) && myRoom != null) {
-        fetch(`/room/${myRoom}`)
+        fetch(`/stats/${myRoom}`)
             .then((response) => (response.ok ? response.json() : Promise.reject()))
             .then((data) => {
                 console.log(data);
                 const listElement = document.querySelector("ul");
                 console.log(data.YoutubeURL.split(','));
-				data.YoutubeURL.split(',').forEach((element) => addList(element));
+                data.YoutubeURL.split(',').forEach((element) => addList(element));
                 console.log(myList);
                 data.YoutubeURL.split(',')
                     .map(convertListToElement)
                     .forEach((element) => listElement.appendChild(element));
-			})
+            })
 
         document.getElementById("add").addEventListener("click", (event) => {
             const headers = new Headers();
@@ -121,13 +119,13 @@ function addList(element) {
                             Promise.reject(response.status);
                     })
                     .then((data) => {
-
                         inputElement.classList.remove("error");
                         inputElement.value = "";
                         const listElement = document.querySelector("ul");
                         listElement.append(convertListToElement(data.YoutubeURL));
-						addList(data.YoutubeURL);
-						console.log(myList);
+                        addList(data.YoutubeURL);
+                        console.log(data.YoutubeURL);
+                        //console.log(myList);
                     })
                     .catch((status) => {
                         console.log(status);
@@ -138,17 +136,17 @@ function addList(element) {
                     });
             }
         });
-		
-		 // 2. This code loads the IFrame Player API code asynchronously.
-		 var tag = document.createElement('script');
 
-		 tag.src = "https://www.youtube.com/iframe_api";
-		 var firstScriptTag = document.getElementsByTagName('script')[0];
-		 firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+        // 2. This code loads the IFrame Player API code asynchronously.
+        var tag = document.createElement('script');
 
-		 // 3. This function creates an <iframe> (and YouTube player)
-		 //    after the API code downloads.
-		 var player;
+        tag.src = "https://www.youtube.com/iframe_api";
+        var firstScriptTag = document.getElementsByTagName('script')[0];
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
 
-    } 
- }
+        // 3. This function creates an <iframe> (and YouTube player)
+        //    after the API code downloads.
+        var player;
+
+    }
+}
