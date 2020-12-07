@@ -1,5 +1,6 @@
 const mainElement = document.getElementsByTagName("main")[0];
 const inputElement = document.querySelector("input");
+
 let myList = [];
 let player;
 let previousIndex = 0;
@@ -12,7 +13,6 @@ function onYouTubeIframeAPIReady() {
         loadPlaylist: {
             listType: 'playlist',
             list: myList,
-            //list: ['lJlEQim-yMo'],
             index: parseInt(0),
             suggestedQuality: 'small'
         },
@@ -26,7 +26,8 @@ function onYouTubeIframeAPIReady() {
 // 4. The API will call this function when the video player is ready.
 function onPlayerReady(event) {
     event.target.loadPlaylist(myList);
-    //event.target.loadPlaylist(['lJlEQim-yMo']);
+	event.target.playVideo();
+	
 }
 
 // 5. The API calls this function when the player's state changes.
@@ -35,11 +36,14 @@ function onPlayerReady(event) {
 var done = false;
 
 function onPlayerStateChange(event) {
+	console.log("getCurrentTime :" +event.target.getCurrentTime());
+
     if (event.data == YT.PlayerState.PLAYING && !done) {
-        setTimeout(stopVideo, 6000);
-        done = true;
+        //setTimeout(stopVideo, 6000);
+        //done = true;
     } else if (event.data == YT.PlayerState.ENDED) {
         let index = player.getPlaylistIndex();
+		
         if (player.getPlaylist().length != myList.length) {
 
             // update playlist and start playing at the proper index
@@ -53,7 +57,8 @@ function onPlayerStateChange(event) {
         to make sure we play the proper video, we use "last index + 1"
         */
         previousIndex = index;
-    }
+    } 
+	event.target.setPlaybackRate(1);
 }
 
 function stopVideo() {
@@ -62,7 +67,7 @@ function stopVideo() {
 
 
 const convertListToElement = (data) => {
-    const template = document.getElementById("url-template");
+	const template = document.getElementById("url-template");
     const clone = template.content.cloneNode(true);
 
     //list.YoutubeURL.forEach(element => clone.querySelector("#url").textContent = element);
@@ -74,28 +79,51 @@ function addList(element) {
     let idIndex = element.lastIndexOf('/') + 1;
     if (element.lastIndexOf('=') + 1 > idIndex)
         idIndex = element.lastIndexOf('=') + 1;
-    myList.push(element.substring(idIndex));
+    
+	if (myList.length==0)
+		myList.push(element.substring(idIndex));
+	else if (myList.find(ele => ele===element.substring(idIndex))=== undefined)
+			myList.push(element.substring(idIndex));
+	
+}
+
+
+function fetchStats(myRoom){
+//This promise will resolve when the network call succeeds
+//Feel free to make a REST fetch using promises and assign it to networkPromise
+	var dataPromise =fetch(`/stats/${myRoom}`)
+		.then((response) => (response.ok ? response.json() : Promise.reject()))
+		.then((data) => {
+			const listElement = document.querySelector("ul");
+			while (listElement.childNodes.length>2) {
+				listElement.removeChild(listElement.lastChild);
+			}
+			data.YoutubeURL.split(',').forEach((element) => addList(element));
+			data.YoutubeURL.split(',')
+				.map(convertListToElement)
+				.forEach((element) => listElement.appendChild(element));
+		})
+
+	//This promise will resolve when 10 seconds have passed
+	var timeOutPromise = new Promise(function(resolve, reject) {
+	// 30 Second delay
+	setTimeout(resolve, 30000, 'Timeout Done');
+	});
+
+	Promise.all(
+	[dataPromise, timeOutPromise]).then(function(values) {
+		//Repeat
+		fetchStats(myRoom);
+	});
 }
 
 window.onload = () => {
 
     const urlParams = new URLSearchParams(window.location.search);
     const myRoom = urlParams.get('room');
-    localStorage.removeItem('YoutubeURL');
 
     if (!isNaN(myRoom) && myRoom != null) {
-        fetch(`/stats/${myRoom}`)
-            .then((response) => (response.ok ? response.json() : Promise.reject()))
-            .then((data) => {
-                console.log(data);
-                const listElement = document.querySelector("ul");
-                console.log(data.YoutubeURL.split(','));
-                data.YoutubeURL.split(',').forEach((element) => addList(element));
-                console.log(myList);
-                data.YoutubeURL.split(',')
-                    .map(convertListToElement)
-                    .forEach((element) => listElement.appendChild(element));
-            })
+		fetchStats(myRoom);
 
         document.getElementById("add").addEventListener("click", (event) => {
             const headers = new Headers();
@@ -122,10 +150,8 @@ window.onload = () => {
                         inputElement.classList.remove("error");
                         inputElement.value = "";
                         const listElement = document.querySelector("ul");
-                        listElement.append(convertListToElement(data.YoutubeURL));
+                        listElement.append(convertListToElement(`${newURL}`));
                         addList(data.YoutubeURL);
-                        console.log(data.YoutubeURL);
-                        //console.log(myList);
                     })
                     .catch((status) => {
                         console.log(status);
