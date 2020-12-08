@@ -1,6 +1,7 @@
 const mainElement = document.getElementsByTagName("main")[0];
 const inputElement = document.querySelector("input");
 
+//to check if server is up an running or can't fetch anything
 const failAllGet = () => {
     const errorElement = document.createElement("section");
     errorElement.classList.add("error");
@@ -35,6 +36,7 @@ window.onload = () => {
 
     //if joinpage is not undefined, click join button
     if (joinpage != undefined) {
+        //for the join button to work on join page
         document.getElementById("join").addEventListener("click", (event) => {
             const copyurl = document.getElementById("youtubeurl").value;
             window.location.href = copyurl;
@@ -42,15 +44,19 @@ window.onload = () => {
     }
     //if createpage is not undefined, click create button
     else if (createpage != undefined) {
+        //for the create button to work on create a room page
         document.getElementById("create").addEventListener("click", (event) => {
             const headers = new Headers();
             headers.set("content-type", "application/json");
 
+            //this is to check if youtube url is inputed. If not, will return error.
             if (document.getElementById("youtubeurl").value === "") {
                 alert("youtube url is required");
             } else {
                 const newURL = document.getElementById("youtubeurl").value;
 
+                //fetching the room and posting youtube url into server for newroom
+                //we've done this before for the todo list assignment, so this part is self explanatory
                 fetch("/api/newroom", {
                         headers,
                         method: "POST",
